@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fit_analysis"
+version = "0.0.2"
+authors = [
+  { name="Steven Trabert" },
+]
+description = "Garmin FIT HRV analysis"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/tsteven4/fit-analysis"
+"Bug Tracker" = "https://github.com/tsteven4/fit-analysis/issues"
+
+[project.scripts]
+analyze_hrv = "fit_analysis.analyze_hrv:main"
