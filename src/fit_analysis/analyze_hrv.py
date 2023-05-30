@@ -64,9 +64,11 @@ def analyze(fitfilename, threshold=DEFAULT_THRESHOLD):
     sd = DecodeState()
     cnt = 0
     warns = []
+    hrvdatafound = False
 
     for record in fitfile.get_messages(["hrv", "record", "event"]):
         if record.name == "hrv":
+            hrvdatafound = True
             if sd.state == state_t.running:
                 for record_data in record:
                     for RR_interval in record_data.value:
@@ -120,6 +122,15 @@ def analyze(fitfilename, threshold=DEFAULT_THRESHOLD):
                 sd = DecodeState()
             elif eventtype == "start":
                 sd.state = state_t.running
+
+    if not hrvdatafound:
+        print(
+            "No HRV data found in "
+            + fitfilename
+            + ". Is HRV logging enabled on your device?",
+            file=sys.stderr,
+        )
+        return
 
     with open(fitfilename.replace(".fit", "") + ".csv", "w") as csvfile:
         print(
