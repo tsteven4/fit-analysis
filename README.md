@@ -1,4 +1,4 @@
-# FIT File Analyis
+# FIT File Analysis
 
 ```
 usage: analyze_hrv [-h] [--threshold THRESHOLD] src
