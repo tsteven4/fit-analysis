@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from datetime import datetime as dt
 from enum import Enum, auto
 import math
+import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
@@ -42,6 +43,7 @@ class DecodeState:
     lon: float = None
     hr: int = None
     rrprev: float = None
+    warnprev: bool = False
     statecnt: int = 0
     q1: deque = deque([0] * N, N)
     state: state_t = state_t.stopped
@@ -71,6 +73,7 @@ threshold = args.threshold
 data = []
 sd = DecodeState()
 cnt = 0
+warns = []
 
 print(
     "timestamp,latitude,longitude,HR(bpm),RR(msec),RRprev(msec),instantaneous HR(bpm),est. SDΔRR(msec),warn"
@@ -107,9 +110,14 @@ for record in fitfile.get_messages(["hrv", "record", "event"]):
                             ]
                         )
                         if sd.statecnt >= (N - 1):
-                            warn = 1 if sigmaest > threshold else 0
+                            warn = sigmaest > threshold
                             data[cnt - (2 * K)][7] = sigmaest
-                            data[cnt - (2 * K)][8] = warn
+                            data[cnt - (2 * K)][8] = int(warn)
+                            if not sd.warnprev and warn:
+                                warns.append([cnt, None])
+                            elif sd.warnprev and not warn:
+                                warns[-1][1] = cnt
+                            sd.warnprev = warn
                         sd.rrprev = rr
                         sd.statecnt += 1
                         cnt += 1
@@ -128,3 +136,46 @@ for record in fitfile.get_messages(["hrv", "record", "event"]):
 
 for row in data:
     print(*row, sep=",")
+
+figno = 0
+for w in warns:
+    wstart = w[0]
+    wend = w[1]
+    if wend == None:
+        wend = data[-1]
+    if (wend - wstart) < 20:
+        continue
+    #plt.style.use("_mpl-gallery")
+
+    nelements = wend - wstart
+    subset = np.array(data[wstart:wend])
+    x = subset[:, 4]
+    y = subset[:, 5]
+    start = subset[0, 0]
+    end = subset[-1, 0]
+
+    fig, ax = plt.subplots(figsize=(10, 10), layout="constrained")
+    ax.scatter(x, y)
+    ax.set(xlim=(0, 1000), ylim=(0, 1000))
+    ax.set_title(
+        "\n".join(
+            [
+                "Poincaré Plot",
+                args.src,
+                str(start) + " to " + str(end),
+                str(end - start),
+            ]
+        ),
+        fontsize=14,
+    )
+    ax.set_xlabel("RR[n](msec)", fontsize=12)
+    ax.set_ylabel("RR[n-1](msec)", fontsize=12)
+    ax.xaxis.grid(True)
+    ax.yaxis.grid(True)
+
+    plt.savefig(args.src.replace(".fit", "") + "-" + str(figno) + ".png")
+
+    figno += 1
+
+if figno > 0:
+    print("Suspicious events found in " + args.src, file=sys.stderr) 
