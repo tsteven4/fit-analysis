@@ -75,9 +75,6 @@ sd = DecodeState()
 cnt = 0
 warns = []
 
-print(
-    "timestamp,latitude,longitude,HR(bpm),RR(msec),RRprev(msec),instantaneous HR(bpm),est. SDΔRR(msec),warn"
-)
 for record in fitfile.get_messages(["hrv", "record", "event"]):
     if record.name == "hrv":
         if sd.state == state_t.running:
@@ -134,8 +131,14 @@ for record in fitfile.get_messages(["hrv", "record", "event"]):
         elif eventtype == "start":
             sd.state = state_t.running
 
-for row in data:
-    print(*row, sep=",")
+with open(args.src.replace(".fit", "") + ".csv", "w") as csvfile:
+    print(
+        "timestamp,latitude,longitude,HR(bpm),RR(msec),RRprev(msec),instantaneous HR(bpm),est. SDΔRR(msec),warn",
+        file=csvfile,
+    )
+    for row in data:
+        print(*row, sep=",", file=csvfile)
+    csvfile.close()
 
 figno = 0
 for w in warns:
@@ -145,7 +148,7 @@ for w in warns:
         wend = data[-1]
     if (wend - wstart) < 20:
         continue
-    #plt.style.use("_mpl-gallery")
+    # plt.style.use("_mpl-gallery")
 
     nelements = wend - wstart
     subset = np.array(data[wstart:wend])
@@ -178,4 +181,4 @@ for w in warns:
     figno += 1
 
 if figno > 0:
-    print("Suspicious events found in " + args.src, file=sys.stderr) 
+    print("Suspicious events found in " + args.src, file=sys.stderr)
