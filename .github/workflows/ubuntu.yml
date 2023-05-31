@@ -1,0 +1,34 @@
+name: "ubuntu"
+
+on:
+  push:
+    branches: [ '**']
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+  schedule:
+    - cron: '27 4 * * 2'
+  workflow_dispatch: ~
+
+jobs:
+  wheel:
+    name: wheel Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Build
+      run: |
+        python3 -m pip install --upgrade build
+        python3 -m build
+
+    - name: Deploy
+      # This only handles continous releases now, for other events artifacts may be saved in
+      # the 'Upload Artifacts' step.
+      if: ( github.event_name == 'push' ) && ( github.ref == 'refs/heads/main' )
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_NAME: Continuous
+      run: |
+        ./tools/uploadtool/upload_github.sh dist/fit_analysis-*-py3-none-any.whl
