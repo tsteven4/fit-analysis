@@ -153,8 +153,8 @@ def analyze(fitfilename, threshold=DEFAULT_THRESHOLD):
 
         nelements = wend - wstart
         subset = np.array(data[wstart:wend])
-        x = subset[:, 4]
-        y = subset[:, 5]
+        y = subset[:, 4]
+        x = subset[:, 5]
         start = subset[0, 0]
         end = subset[-1, 0]
 
@@ -172,8 +172,8 @@ def analyze(fitfilename, threshold=DEFAULT_THRESHOLD):
             ),
             fontsize=14,
         )
-        ax.set_xlabel("RR[n](msec)", fontsize=12)
-        ax.set_ylabel("RR[n-1](msec)", fontsize=12)
+        ax.set_xlabel("$RR_{n}(msec)$", fontsize=12)
+        ax.set_ylabel("$RR_{n+1}(msec)$", fontsize=12)
         ax.xaxis.grid(True)
         ax.yaxis.grid(True)
 
