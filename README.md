@@ -20,7 +20,7 @@ If zone(s) are identified a message "Suspicious events found in ..." is printed 
 The program may not identify zones where evidence of an arrhythmia exists.  The program may erroneously identify zones where no arrhythmia occurred.  Artifacts in the data may make the program unreliable.  The program is not intended to identify all types of arrhythmia.  Interpretations of the validity and significance of the results is left to the user and their doctor.
 
 ```
-usage: analyze_hrv [-h] [--threshold THRESHOLD] src
+usage: analyze_hrv [-h] [--scale SCALE] [--threshold THRESHOLD] src
 
 FIT file HRV analyzer
 
@@ -29,6 +29,8 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
+  --scale SCALE, -s SCALE
+                        Maximum value for plots(seconds) (default: 1.0)
   --threshold THRESHOLD, -t THRESHOLD
                         SDΔRR warning threshold(msec) (default: 50)
 ```
