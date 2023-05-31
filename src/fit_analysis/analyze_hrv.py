@@ -132,7 +132,7 @@ def analyze(fitfilename, threshold=DEFAULT_THRESHOLD):
         )
         return
 
-    with open(fitfilename.replace(".fit", "") + ".csv", "w") as csvfile:
+    with open(fitfilename.replace(".fit", "") + ".csv", "w", encoding="utf-8") as csvfile:
         print(
             "timestamp,latitude,longitude,HR(bpm),RR(msec),RRprev(msec),instantaneous HR(bpm),est. SDΔRR(msec),warn",
             file=csvfile,
