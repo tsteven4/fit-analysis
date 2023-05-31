@@ -16,6 +16,11 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+  "fitparse",
+  "matplotlib",
+  "numpy",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/tsteven4/fit-analysis"
