@@ -28,9 +28,10 @@ import numpy as np
 import sys
 
 DEFAULT_THRESHOLD = 50
+DEFAULT_AXIS_LIMIT = 1.0
 
 
-def analyze(fitfilename, threshold=DEFAULT_THRESHOLD):
+def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHOLD):
     K = 16
     N = (4 * K) + 1
 
@@ -132,7 +133,9 @@ def analyze(fitfilename, threshold=DEFAULT_THRESHOLD):
         )
         return
 
-    with open(fitfilename.replace(".fit", "") + ".csv", "w", encoding="utf-8") as csvfile:
+    with open(
+        fitfilename.replace(".fit", "") + ".csv", "w", encoding="utf-8"
+    ) as csvfile:
         print(
             "timestamp,latitude,longitude,HR(bpm),RR(msec),RRprev(msec),instantaneous HR(bpm),est. SDΔRR(msec),warn",
             file=csvfile,
@@ -160,7 +163,7 @@ def analyze(fitfilename, threshold=DEFAULT_THRESHOLD):
 
         fig, ax = plt.subplots(figsize=(10, 10), layout="constrained")
         ax.scatter(x, y)
-        ax.set(xlim=(0, 1000), ylim=(0, 1000))
+        ax.set(xlim=(0, axislimit * 1000), ylim=(0, axislimit * 1000))
         ax.set_title(
             "\n".join(
                 [
@@ -193,6 +196,13 @@ def main():
     )
     parser.add_argument("src", help="Input FIT file")
     parser.add_argument(
+        "--axislimit",
+        "-a",
+        type=float,
+        help="Maximum axis value for plots(seconds)",
+        default=DEFAULT_AXIS_LIMIT,
+    )
+    parser.add_argument(
         "--threshold",
         "-t",
         type=float,
@@ -200,7 +210,7 @@ def main():
         default=DEFAULT_THRESHOLD,
     )
     args = parser.parse_args()
-    analyze(fitfilename=args.src, threshold=args.threshold)
+    analyze(fitfilename=args.src, axislimit=args.axislimit, threshold=args.threshold)
 
 
 if __name__ == "__main__":
