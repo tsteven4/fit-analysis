@@ -28,10 +28,10 @@ import numpy as np
 import sys
 
 DEFAULT_THRESHOLD = 50
-DEFAULT_SCALE = 1.0
+DEFAULT_AXIS_LIMIT = 1.0
 
 
-def analyze(fitfilename, scale=DEFAULT_SCALE, threshold=DEFAULT_THRESHOLD):
+def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHOLD):
     K = 16
     N = (4 * K) + 1
 
@@ -163,7 +163,7 @@ def analyze(fitfilename, scale=DEFAULT_SCALE, threshold=DEFAULT_THRESHOLD):
 
         fig, ax = plt.subplots(figsize=(10, 10), layout="constrained")
         ax.scatter(x, y)
-        ax.set(xlim=(0, scale * 1000), ylim=(0, scale * 1000))
+        ax.set(xlim=(0, axislimit * 1000), ylim=(0, axislimit * 1000))
         ax.set_title(
             "\n".join(
                 [
@@ -196,11 +196,11 @@ def main():
     )
     parser.add_argument("src", help="Input FIT file")
     parser.add_argument(
-        "--scale",
-        "-s",
+        "--axislimit",
+        "-a",
         type=float,
-        help="Maximum value for plots(seconds)",
-        default=DEFAULT_SCALE,
+        help="Maximum axis value for plots(seconds)",
+        default=DEFAULT_AXIS_LIMIT,
     )
     parser.add_argument(
         "--threshold",
@@ -210,7 +210,7 @@ def main():
         default=DEFAULT_THRESHOLD,
     )
     args = parser.parse_args()
-    analyze(fitfilename=args.src, scale=args.scale, threshold=args.threshold)
+    analyze(fitfilename=args.src, axislimit=args.axislimit, threshold=args.threshold)
 
 
 if __name__ == "__main__":
