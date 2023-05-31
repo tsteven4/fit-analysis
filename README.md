@@ -43,7 +43,7 @@ If you are using Garmin Connect, instructions for exporting your data can be fou
 
 A recent version of python 3 is required. 
 
-You can download the python .whl file from [github](https://github.com/tsteven4/fit-analysis/releases).  Expand "Assets" and select the .whl file.  The "Continuous build" release on that page is continuously updated as changes are made.  The .whl file from older releases are not archived.  The version number may or may not change when it is updated.
+You can download a python .whl file to install fit-analysis from [github](https://github.com/tsteven4/fit-analysis/releases).  Expand "Assets" and select the .whl file.  The "Continuous build" release on that page is continuously updated as changes are made.  The .whl file from older releases are not archived.  The version number may or may not change when it is updated.
 
 You can install the .whl file with pip3.  Substitute the actual name of the .whl file you downloaded.  For example, from a command prompt (DOS, powershell, bash, etc.) :
 ```
