@@ -30,7 +30,7 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --threshold THRESHOLD, -t THRESHOLD
-                        HRV threshold(msec) (default: 50)
+                        SDΔRR warning threshold(msec) (default: 50)
 ```
 
 ## Data Collection

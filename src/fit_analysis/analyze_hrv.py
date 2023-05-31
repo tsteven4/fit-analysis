@@ -196,7 +196,7 @@ def main():
         "--threshold",
         "-t",
         type=float,
-        help="HRV threshold(msec)",
+        help="SDΔRR warning threshold(msec)",
         default=DEFAULT_THRESHOLD,
     )
     args = parser.parse_args()
