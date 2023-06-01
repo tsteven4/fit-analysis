@@ -24,11 +24,30 @@ from enum import Enum, auto
 import sys
 
 import fitparse
+import folium
 import matplotlib.pyplot as plt
 import numpy as np
 
 DEFAULT_THRESHOLD = 50
 DEFAULT_AXIS_LIMIT = 1.0
+
+
+def cleanll(a):
+    """remove rows that contain None values
+
+    Parameters
+    ----------
+    a : ndarray
+        The input array that may contain rows with None values
+
+    Returns
+    -------
+    ndarray
+        array without the rows that had None values
+    """
+
+    # pylint: disable=singleton-comparison
+    return a[np.logical_not((a == None).any(axis=1)), :]
 
 
 def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHOLD):
@@ -145,6 +164,12 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
             print(*row, sep=",", file=csvfile)
         csvfile.close()
 
+    genmap = len(warns) != 0
+    if genmap:
+        eventmap = folium.Map()
+        folium.PolyLine(cleanll(np.array(data)[:, [1, 2]])).add_to(eventmap)
+        eventmap.fit_bounds(eventmap.get_bounds(), padding=(10, 10))
+
     figno = 0
     for w in warns:
         wstart = w[0]
@@ -160,6 +185,8 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
         start = subset[0, 0]
         end = subset[-1, 0]
 
+        if genmap:
+            folium.PolyLine(cleanll(subset[:, [1, 2]]), color="red").add_to(eventmap)
         fig, ax = plt.subplots(figsize=(10, 10), layout="constrained")
         ax.scatter(x, y)
         ax.set(xlim=(0, axislimit * 1000), ylim=(0, axislimit * 1000))
@@ -186,6 +213,8 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
 
         figno += 1
 
+    if genmap:
+        eventmap.save(fitfilename.replace(".fit", ".html"))
     if figno > 0:
         print("Suspicious events found in " + fitfilename, file=sys.stderr)
 
