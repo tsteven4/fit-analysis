@@ -16,16 +16,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-import fitparse
 import argparse
 from collections import deque
 from dataclasses import dataclass
 from datetime import datetime as dt
 from enum import Enum, auto
-import math
+import sys
+
+import fitparse
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
 
 DEFAULT_THRESHOLD = 50
 DEFAULT_AXIS_LIMIT = 1.0
@@ -36,8 +36,8 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
     N = (4 * K) + 1
 
     class state_t(Enum):
-        stopped = auto()
-        running = auto()
+        STOPPED = auto()
+        RUNNING = auto()
 
     @dataclass
     class DecodeState:
@@ -49,7 +49,7 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
         warnprev: bool = False
         statecnt: int = 0
         q1: deque = deque([0] * N, N)
-        state: state_t = state_t.stopped
+        state: state_t = state_t.STOPPED
 
     try:
         fitfile = fitparse.FitFile(
@@ -58,7 +58,7 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
             data_processor=fitparse.processors.StandardUnitsDataProcessor(),
         )
     except fitparse.utils.FitParseError as e:
-        print("Error while parsing .FIT file: %s" % e)
+        print(f"Error while parsing .FIT file: {e}")
         sys.exit(1)
 
     data = []
@@ -70,13 +70,13 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
     for record in fitfile.get_messages(["hrv", "record", "event"]):
         if record.name == "hrv":
             hrvdatafound = True
-            if sd.state == state_t.running:
+            if sd.state == state_t.RUNNING:
                 for record_data in record:
-                    for RR_interval in record_data.value:
-                        if RR_interval is not None:
-                            rr = RR_interval * 1000.0
+                    for rr_interval in record_data.value:
+                        if rr_interval is not None:
+                            rr = rr_interval * 1000.0
                             sd.q1.pop()
-                            if sd.rrprev == None:
+                            if sd.rrprev is None:
                                 sd.q1.appendleft(0.0)
                             else:
                                 sd.q1.appendleft(rr - sd.rrprev)
@@ -94,7 +94,7 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
                                     sd.hr,
                                     rr,
                                     sd.rrprev,
-                                    60.0 / RR_interval,
+                                    60.0 / rr_interval,
                                     "",
                                     "",
                                 ]
@@ -122,7 +122,7 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
             if eventtype == "stop_all":
                 sd = DecodeState()
             elif eventtype == "start":
-                sd.state = state_t.running
+                sd.state = state_t.RUNNING
 
     if not hrvdatafound:
         print(
@@ -137,7 +137,8 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
         fitfilename.replace(".fit", "") + ".csv", "w", encoding="utf-8"
     ) as csvfile:
         print(
-            "timestamp,latitude,longitude,HR(bpm),RR(msec),RRprev(msec),instantaneous HR(bpm),est. SDΔRR(msec),warn",
+            "timestamp,latitude,longitude,HR(bpm),RR(msec),RRprev(msec),"
+            "instantaneous HR(bpm),est. SDΔRR(msec),warn",
             file=csvfile,
         )
         for row in data:
@@ -148,13 +149,11 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
     for w in warns:
         wstart = w[0]
         wend = w[1]
-        if wend == None:
+        if wend is None:
             wend = len(data) - 1
         if (wend - wstart) < 20:
             continue
-        # plt.style.use("_mpl-gallery")
 
-        nelements = wend - wstart
         subset = np.array(data[wstart:wend])
         y = subset[:, 4]
         x = subset[:, 5]
@@ -183,7 +182,7 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
         ax.yaxis.grid(True)
 
         plt.savefig(fitfilename.replace(".fit", "") + "-" + str(figno) + ".png")
-        plt.close()
+        plt.close(fig)
 
         figno += 1
 
