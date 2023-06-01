@@ -169,18 +169,21 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
                 [
                     "Poincaré Plot",
                     fitfilename,
-                    str(start) + " to " + str(end),
-                    str(end - start),
+                    f"{start} to {end}",
+                    f"Duration: {end - start}, "
+                    + r"$\overline{HR}$"
+                    + f": {1000.0*60.0*len(x)/sum(x):.1f} bpm",
                 ]
             ),
             fontsize=14,
         )
-        ax.set_xlabel("$RR_{n}(msec)$", fontsize=12)
-        ax.set_ylabel("$RR_{n+1}(msec)$", fontsize=12)
+        ax.set_xlabel(r"$RR_{n}(msec)$", fontsize=12)
+        ax.set_ylabel(r"$RR_{n+1}(msec)$", fontsize=12)
         ax.xaxis.grid(True)
         ax.yaxis.grid(True)
 
         plt.savefig(fitfilename.replace(".fit", "") + "-" + str(figno) + ".png")
+        plt.close()
 
         figno += 1
 
