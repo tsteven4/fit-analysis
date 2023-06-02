@@ -139,6 +139,9 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
             eventtype = record.get_value("event_type")
             # hrv data is unreliable after stop_all until we get started again
             if eventtype == "stop_all":
+                # terminate any active warning
+                if len(warns) != 0 and warns[-1][1] is None:
+                    warns[-1][1] = cnt
                 sd = DecodeState()
             elif eventtype == "start":
                 sd.state = state_t.RUNNING
@@ -175,7 +178,7 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
         wstart = w[0]
         wend = w[1]
         if wend is None:
-            wend = len(data) - 1
+            wend = len(data)
         if (wend - wstart) < 20:
             continue
 
