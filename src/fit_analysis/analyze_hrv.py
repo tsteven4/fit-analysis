@@ -50,7 +50,7 @@ def cleanll(a):
     return a[np.logical_not((a == None).any(axis=1)), :]
 
 
-def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHOLD):
+def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHOLD, includestopped=False):
     K = 16
     N = (4 * K) + 1
 
@@ -138,7 +138,7 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
         elif record.name == "event":
             eventtype = record.get_value("event_type")
             # hrv data is unreliable after stop_all until we get started again
-            if eventtype == "stop_all":
+            if not includestopped and eventtype == "stop_all":
                 # terminate any active warning
                 if len(warns) != 0 and warns[-1][1] is None:
                     warns[-1][1] = cnt
@@ -192,6 +192,7 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
             folium.PolyLine(cleanll(subset[:, [1, 2]]), color="red").add_to(eventmap)
         fig, ax = plt.subplots(figsize=(10, 10), layout="constrained")
         ax.scatter(x, y)
+        ax.plot(x, y, alpha=0.1)
         ax.set(xlim=(0, axislimit * 1000), ylim=(0, axislimit * 1000))
         ax.set_title(
             "\n".join(
@@ -243,8 +244,14 @@ def main():
         help="SDΔRR warning threshold(msec)",
         default=DEFAULT_THRESHOLD,
     )
+    parser.add_argument(
+        "--includestopped",
+        "-i",
+        action='store_true',
+        help="include data while stopped",
+    )
     args = parser.parse_args()
-    analyze(fitfilename=args.src, axislimit=args.axislimit, threshold=args.threshold)
+    analyze(fitfilename=args.src, axislimit=args.axislimit, threshold=args.threshold, includestopped=args.includestopped)
 
 
 if __name__ == "__main__":
