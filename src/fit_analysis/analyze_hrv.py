@@ -192,6 +192,7 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
             folium.PolyLine(cleanll(subset[:, [1, 2]]), color="red").add_to(eventmap)
         fig, ax = plt.subplots(figsize=(10, 10), layout="constrained")
         ax.scatter(x, y)
+        ax.plot(x, y, alpha=0.1)
         ax.set(xlim=(0, axislimit * 1000), ylim=(0, axislimit * 1000))
         ax.set_title(
             "\n".join(
