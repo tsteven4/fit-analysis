@@ -190,6 +190,8 @@ def analyze(fitfilename, axislimit=DEFAULT_AXIS_LIMIT, threshold=DEFAULT_THRESHO
 
         if genmap:
             folium.PolyLine(cleanll(subset[:, [1, 2]]), color="red").add_to(eventmap)
+            folium.Circle(subset[0, [1, 2]], color="red", fill=True, radius=10).add_to(eventmap)
+            folium.Circle(subset[-1, [1, 2]], color="green", fill=True, radius=10).add_to(eventmap)
         fig, ax = plt.subplots(figsize=(10, 10), layout="constrained")
         ax.scatter(x, y)
         ax.plot(x, y, alpha=0.1)

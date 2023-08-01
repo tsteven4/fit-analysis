@@ -50,7 +50,7 @@ You can download a python .whl file to install fit-analysis from [github](https:
 
 You can install the .whl file with pip3.  Substitute the actual name of the .whl file you downloaded.  For example, from a command prompt (DOS, powershell, bash, etc.) :
 ```
-pip3 install --upgrade fit_analysis-0.0.2-py3-none-any.whl
+pip3 install --upgrade fit_analysis-0.0.10-py3-none-any.whl
 ```
 
 ### Windows
